@@ -24,16 +24,12 @@ ipcMain.handle('dialog:openFolder', async () => {
   return canceled ? null : filePaths[0];
 });
 
-// Existing export-pdf handler (if needed)
-// ipcMain.handle('export-pdf', async (event, markdownPath) => { ... });
-
-// NEW: Handle rendered markdown PDF export
+// Handle rendered markdown PDF export
 ipcMain.handle('export-rendered-pdf', async (event, { html, markdownPath }) => {
   if (!markdownPath) {
-    return { success: false, error: "No markdown file provided" };
+    return { success: false, error: 'No markdown file provided' };
   }
   try {
-    // Create a hidden BrowserWindow to load the HTML
     const pdfWin = new BrowserWindow({
       show: false,
       webPreferences: {
@@ -42,13 +38,11 @@ ipcMain.handle('export-rendered-pdf', async (event, { html, markdownPath }) => {
       },
     });
 
-    // Load the rendered HTML via a data URL
-    await pdfWin.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(html));
-
-    // Give the window a moment to render the content
+    await pdfWin.loadURL(
+      'data:text/html;charset=utf-8,' + encodeURIComponent(html)
+    );
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    // Print to PDF with background and clickable links enabled
     const pdfData = await pdfWin.webContents.printToPDF({
       printBackground: true,
       landscape: false,
@@ -59,10 +53,10 @@ ipcMain.handle('export-rendered-pdf', async (event, { html, markdownPath }) => {
     const pdfFilePath = path.join(folder, `${baseName}.pdf`);
     fs.writeFileSync(pdfFilePath, pdfData);
     pdfWin.close();
-    console.log("PDF exported to:", pdfFilePath);
+    console.log('PDF exported to:', pdfFilePath);
     return { success: true };
   } catch (error) {
-    console.error("PDF export failed", error);
+    console.error('PDF export failed', error);
     return { success: false, error };
   }
 });

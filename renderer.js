@@ -43,7 +43,7 @@ function flashEditorSaved() {
 
 function saveCurrentFile() {
   if (!currentFilePath) return;
-  const content = editor.innerText; // Use innerText to preserve line breaks
+  const content = editor.innerText; // Preserve line breaks
   fs.writeFile(currentFilePath, content, 'utf8', (err) => {
     if (err) console.error('Save failed:', err);
     else {
@@ -56,7 +56,7 @@ function saveCurrentFile() {
 // Auto-save every 8 seconds
 setInterval(saveCurrentFile, 8000);
 
-// Save on Ctrl+S (or Command+S)
+// Save on Ctrl+S / Command+S
 document.addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key === 's') {
     e.preventDefault();
@@ -108,7 +108,6 @@ function addSidebarItem(name, isDirectory) {
   item.textContent = name;
   if (isDirectory) {
     item.style.fontWeight = 'bold';
-    // Don’t add a click listener if it's a folder
   } else {
     item.addEventListener('click', () => {
       saveCurrentFile();
@@ -159,66 +158,46 @@ document.getElementById('newFile').addEventListener('click', async () => {
   }
   fs.writeFile(newFilePath, '', (err) => {
     if (err) return console.error(err);
-    const item = document.createElement('div');
-    item.textContent = path.basename(newFilePath);
-    item.addEventListener('click', () => {
-      saveCurrentFile();
-      openFile(newFilePath);
-    });
-    sidebar.appendChild(item);
+    // Let the folder watcher add the new file to the sidebar.
     currentFilePath = newFilePath;
     editor.textContent = '';
+    // Optionally, open the new file immediately:
+    openFile(newFilePath);
   });
 });
 
 // --- Export PDF ---
-// This listener converts your markdown into rendered HTML and sends it to main.
 document.getElementById('exportPDF').addEventListener('click', async () => {
   if (!currentFilePath) {
     alert('No file is currently open to export.');
     return;
   }
   const folder = path.dirname(currentFilePath);
-
-  // Convert current markdown to HTML using marked
   const markdownContent = editor.innerText;
   const rawHtml = marked.parse(markdownContent);
 
-  // Convert <img src="relative/path.png"> into a base64 data URL
-  // so the PDF can embed them directly.
   const htmlWithEmbeddedImages = rawHtml.replace(
     /<img\s+src="([^"]+)"/g,
     (match, srcPath) => {
-      // Skip external or data URIs
       if (srcPath.startsWith('http') || srcPath.startsWith('data:')) {
         return match;
       }
-
       try {
-        // Build absolute path
         const absPath = path.join(folder, srcPath);
-
-        // Read the file as base64
         const imageData = fs.readFileSync(absPath);
-        // Infer the file extension for the MIME type
         let ext = path.extname(absPath).toLowerCase().replace('.', '');
-        // Some quick normalizations
         if (ext === 'jpg') ext = 'jpeg';
         if (ext === 'svg') ext = 'svg+xml';
-
-        // Return the embedded data URI
         return `<img src="data:image/${ext};base64,${imageData.toString(
           'base64'
         )}"`;
       } catch (err) {
         console.error('Failed to embed image:', srcPath, err);
-        // If something goes wrong, just leave the original tag in place
         return match;
       }
     }
   );
 
-  // Build a minimal HTML doc with embedded images
   const fullHtml = `
     <!DOCTYPE html>
     <html>
@@ -237,7 +216,6 @@ document.getElementById('exportPDF').addEventListener('click', async () => {
     </html>
   `;
 
-  // Now send that to the main process
   const result = await ipcRenderer.invoke('export-rendered-pdf', {
     html: fullHtml,
     markdownPath: currentFilePath,
