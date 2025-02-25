@@ -65,29 +65,69 @@ document.addEventListener('keydown', (e) => {
 // Save on window close
 window.addEventListener('beforeunload', saveCurrentFile);
 
-// --- Folder & File Handling ---
+let folderWatcher = null; // Global watcher for current folder
+
 function loadFolder(folderPath) {
   currentFolder = folderPath;
-  localStorage.setItem('workspace', folderPath); // Remember workspace
+  localStorage.setItem('workspace', folderPath);
   sidebar.innerHTML = ''; // Clear sidebar
 
+  // Close any existing watcher
+  if (folderWatcher) folderWatcher.close();
+
+  // Populate sidebar initially
   fs.readdir(folderPath, { withFileTypes: true }, (err, entries) => {
     if (err) return console.error(err);
     entries.forEach((entry) => {
-      const item = document.createElement('div');
-      item.textContent = entry.name;
-      if (entry.isDirectory()) {
-        item.style.fontWeight = 'bold';
-      }
-      item.addEventListener('click', () => {
-        if (!entry.isDirectory()) {
-          saveCurrentFile();
-          openFile(path.join(folderPath, entry.name));
-        }
-      });
-      sidebar.appendChild(item);
+      addSidebarItem(entry.name, entry.isDirectory());
     });
   });
+
+  // Set up a watcher for the folder
+  folderWatcher = fs.watch(folderPath, (event, filename) => {
+    if (!filename) return;
+    const filePath = path.join(folderPath, filename);
+
+    // Check if item already exists in sidebar
+    const existingItem = Array.from(sidebar.children).find(
+      (item) => item.textContent === filename
+    );
+
+    if (!fs.existsSync(filePath)) {
+      // File or folder was deleted; remove from sidebar if it exists.
+      if (existingItem) {
+        sidebar.removeChild(existingItem);
+        console.log(`Removed ${filename} from sidebar because it was deleted.`);
+      }
+    } else {
+      // File or folder exists (new or modified)
+      if (!existingItem) {
+        // New item detected; add it.
+        const isDir = fs.lstatSync(filePath).isDirectory();
+        addSidebarItem(filename, isDir);
+        console.log(`Added ${filename} to sidebar.`);
+      }
+    }
+  });
+}
+
+// Helper function to add an item to the sidebar
+function addSidebarItem(name, isDirectory) {
+  const item = document.createElement('div');
+  item.textContent = name;
+  if (isDirectory) {
+    item.style.fontWeight = 'bold';
+  }
+  item.addEventListener('click', () => {
+    const fullPath = path.join(currentFolder, name);
+    if (isDirectory) {
+      loadFolder(fullPath);
+    } else {
+      saveCurrentFile();
+      openFile(fullPath);
+    }
+  });
+  sidebar.appendChild(item);
 }
 
 function openFile(filePath) {
