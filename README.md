@@ -1,6 +1,7 @@
 # WR1TE
 
 WR1TE is a minimal Electron-based Markdown editor and workspace app for creating, editing, and previewing Markdown (`.md`) and text (`.txt`) files. It also supports viewing media files like images and PDFs in a split preview mode.
+WR1TE is designed for OLED displays, so the black background is intentional and by design.
 
 ## Note
 
