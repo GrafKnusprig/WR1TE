@@ -16,11 +16,13 @@
   },
   "build": {
     "appId": "com.example.wr1te",
-    "productName": "wr1te",
+    "productName": "WR1TE",
     "files": [
-      "dist/**/*",
-      "node_modules/**/*",
-      "package.json"
+      "main.js",
+      "renderer.js",
+      "index.html",
+      "styles.css",
+      "icon.ico"
     ],
     "win": {
       "icon": "icon.ico",

@@ -339,15 +339,34 @@ editor.addEventListener('drop', (e) => {
   const folder = path.dirname(currentFilePath);
   Array.from(e.dataTransfer.files).forEach((file) => {
     if (file.type.startsWith('image/')) {
-      const ext = path.extname(file.path);
+      const srcPath = file.path;
+      // Use file.name if file.path is missing; default to .png if no extension found.
+      const ext = path.extname(srcPath || file.name) || '.png';
       const imageName = `image_${Date.now()}${ext}`;
       const destPath = path.join(folder, imageName);
-      fs.copyFile(file.path, destPath, (err) => {
-        if (err) console.error('Image copy failed:', err);
-        else {
-          insertAtCursor(`\n\n![Image](${imageName})\n`);
-        }
-      });
+
+      if (srcPath) {
+        fs.copyFile(srcPath, destPath, (err) => {
+          if (err) {
+            console.error('Image copy failed:', err);
+          } else {
+            insertAtCursor(`\n\n![Image](${imageName})\n`);
+          }
+        });
+      } else {
+        // Fallback: use FileReader to load the file and write it manually.
+        const reader = new FileReader();
+        reader.onload = function () {
+          const buffer = Buffer.from(reader.result);
+          fs.writeFile(destPath, buffer, (err) => {
+            if (err) console.error('Image save failed:', err);
+            else {
+              insertAtCursor(`\n\n![Image](${imageName})\n`);
+            }
+          });
+        };
+        reader.readAsArrayBuffer(file);
+      }
     }
   });
 });
