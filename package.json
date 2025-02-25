@@ -1,0 +1,34 @@
+{
+  "name": "wr1te",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "electron": "^34.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+      "appId": "com.example.yourapp",
+      "productName": "YourApp",
+      "files": [
+        "dist/**/*",
+        "node_modules/**/*",
+        "package.json"
+      ],
+      "mac": {
+        "target": "dmg"
+      },
+      "win": {
+        "target": "nsis"
+      },
+      "linux": {
+        "target": "AppImage"
+      }
+  }
+}
