@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder"
   },
   "keywords": [],
   "author": "",
@@ -14,21 +15,16 @@
     "electron-builder": "^25.1.8"
   },
   "build": {
-    "appId": "com.example.yourapp",
-    "productName": "YourApp",
+    "appId": "com.example.wr1te",
+    "productName": "wr1te",
     "files": [
       "dist/**/*",
       "node_modules/**/*",
       "package.json"
     ],
-    "mac": {
-      "target": "dmg"
-    },
     "win": {
+      "icon": "icon.ico",
       "target": "nsis"
-    },
-    "linux": {
-      "target": "AppImage"
     }
   },
   "dependencies": {

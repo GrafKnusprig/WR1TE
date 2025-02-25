@@ -154,3 +154,27 @@ body {
   padding: 5px 10px;
   cursor: pointer;
 }
+/* Dark theme for preview panel */
+#previewPanel {
+  position: fixed;
+  top: 40px; /* below menu */
+  right: 0;
+  bottom: 0;
+  width: 50%;
+  padding: 10px;
+  overflow-y: auto;
+  background: #1e1e1e;
+  color: #d4d4d4;
+}
+#previewPanel a {
+  color: #569cd6;
+}
+#previewPanel img {
+  max-width: 100%;
+}
+.hidden {
+  display: none;
+}
+#editor.split {
+  width: 50%;
+}

@@ -5,10 +5,12 @@ const { marked } = require('marked');
 
 const sidebar = document.getElementById('sidebar');
 const editor = document.getElementById('editor');
+const previewPanel = document.getElementById('previewPanel');
 
 let currentFolder = null;
 let currentFilePath = null;
 let folderWatcher = null; // Global watcher for current folder
+let previewActive = false;
 
 // --- Modal Setup ---
 const modal = document.getElementById('modal');
@@ -43,7 +45,7 @@ function flashEditorSaved() {
 
 function saveCurrentFile() {
   if (!currentFilePath) return;
-  const content = editor.innerText; // Preserve line breaks
+  const content = editor.innerText; // Use innerText to preserve line breaks
   fs.writeFile(currentFilePath, content, 'utf8', (err) => {
     if (err) console.error('Save failed:', err);
     else {
@@ -56,7 +58,7 @@ function saveCurrentFile() {
 // Auto-save every 8 seconds
 setInterval(saveCurrentFile, 8000);
 
-// Save on Ctrl+S / Command+S
+// Save on Ctrl+S (or Command+S)
 document.addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key === 's') {
     e.preventDefault();
@@ -124,6 +126,7 @@ function openFile(filePath) {
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) return console.error(err);
     editor.innerText = data;
+    if (previewActive) updatePreview();
   });
 }
 
@@ -161,12 +164,10 @@ document.getElementById('newFile').addEventListener('click', async () => {
     // Let the folder watcher add the new file to the sidebar.
     currentFilePath = newFilePath;
     editor.textContent = '';
-    // Optionally, open the new file immediately:
     openFile(newFilePath);
   });
 });
 
-// --- Export PDF ---
 document.getElementById('exportPDF').addEventListener('click', async () => {
   if (!currentFilePath) {
     alert('No file is currently open to export.');
@@ -225,6 +226,49 @@ document.getElementById('exportPDF').addEventListener('click', async () => {
   } else {
     alert('PDF export failed: ' + (result.error || 'Unknown error'));
   }
+});
+
+// --- Preview Split View ---
+document.getElementById('preview').addEventListener('click', togglePreview);
+
+function togglePreview() {
+  previewActive = !previewActive;
+  if (previewActive) {
+    // Enable split view: adjust editor and show preview panel
+    editor.classList.add('split');
+    previewPanel.classList.remove('hidden');
+    updatePreview();
+  } else {
+    // Disable preview: hide preview panel and let editor use full width
+    previewPanel.classList.add('hidden');
+    editor.classList.remove('split');
+  }
+}
+
+function updatePreview() {
+  if (previewActive) {
+    let html = marked.parse(editor.innerText);
+    if (currentFilePath) {
+      const folder = path.dirname(currentFilePath);
+      // Replace relative src paths with absolute file:// URLs
+      html = html.replace(/<img\s+src="([^"]+)"/g, (match, srcPath) => {
+        if (
+          !srcPath.startsWith('file://') &&
+          !srcPath.startsWith('http') &&
+          !srcPath.startsWith('data:')
+        ) {
+          const absolutePath = path.join(folder, srcPath);
+          return `<img src="file://${absolutePath.replace(/\\/g, '/')}"`;
+        }
+        return match;
+      });
+    }
+    previewPanel.innerHTML = html;
+  }
+}
+
+editor.addEventListener('input', () => {
+  if (previewActive) updatePreview();
 });
 
 // --- Reload Last Workspace & File on Startup ---
