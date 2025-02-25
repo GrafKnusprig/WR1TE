@@ -106,15 +106,16 @@ function loadFolder(folderPath) {
 function addSidebarItem(name, isDirectory) {
   const item = document.createElement('div');
   item.textContent = name;
-  if (isDirectory) item.style.fontWeight = 'bold';
-  item.addEventListener('click', () => {
-    const fullPath = path.join(currentFolder, name);
-    if (isDirectory) loadFolder(fullPath);
-    else {
+  if (isDirectory) {
+    item.style.fontWeight = 'bold';
+    // Don’t add a click listener if it's a folder
+  } else {
+    item.addEventListener('click', () => {
       saveCurrentFile();
+      const fullPath = path.join(currentFolder, name);
       openFile(fullPath);
-    }
-  });
+    });
+  }
   sidebar.appendChild(item);
 }
 
