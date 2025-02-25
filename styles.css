@@ -25,14 +25,18 @@ body {
   background: black;
 }
 ::-webkit-scrollbar-thumb {
-  background: #555;
+  background: var(--editor-fg-color);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #777;
+  background: white;
 }
 ::-webkit-scrollbar-corner {
   background: black;
+}
+
+:root {
+  --editor-fg-color: #ffffff; /* default color */
 }
 
 /* Top menu bar */
@@ -53,10 +57,14 @@ body {
 /* Buttons in the menu */
 #menu button {
   background: black;
-  color: white;
-  border: 1px solid white;
+  color: var(--editor-fg-color);
+  border: 1px solid var(--editor-fg-color);
   padding: 5px 10px;
   cursor: pointer;
+}
+
+#menu input[type='color'] {
+  background: black;
 }
 
 /* Sidebar on the left */
@@ -66,10 +74,17 @@ body {
   left: 0;
   bottom: 0;
   width: 200px;
+  color: var(--editor-fg-color);
   background: black; /* full black */
   padding: 10px;
   overflow-y: auto;
-  border-right: 1px solid white;
+  border-right: 1px solid var(--editor-fg-color);
+}
+
+#sidebar div.sidebar-item.active {
+  border: 1px solid #ffffff;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 3px;
 }
 
 /* Main editor area */
@@ -81,6 +96,7 @@ body {
   bottom: 0;
   padding: 10px;
   overflow-y: auto;
+  color: var(--editor-fg-color);
   background: black; /* full black */
   border-left: 1px solid transparent; /* optional or remove */
   border-right: 1px solid transparent; /* optional or remove */
@@ -121,7 +137,7 @@ body {
 /* Modal content */
 .modal-content {
   background: #222;
-  border: 1px solid white;
+  border: 1px solid var(--editor-fg-color);
   padding: 20px;
   width: 300px;
   border-radius: 4px;
@@ -130,7 +146,7 @@ body {
 
 .modal-content h3 {
   margin-top: 0;
-  color: white;
+  color: var(--editor-fg-color);
 }
 
 .modal-content input {
@@ -138,8 +154,8 @@ body {
   padding: 5px;
   margin: 10px 0;
   background: black;
-  border: 1px solid white;
-  color: white;
+  border: 1px solid var(--editor-fg-color);
+  color: var(--editor-fg-color);
 }
 
 .modal-buttons {
@@ -149,8 +165,8 @@ body {
 
 .modal-buttons button {
   background: black;
-  color: white;
-  border: 1px solid white;
+  color: var(--editor-fg-color);
+  border: 1px solid var(--editor-fg-color);
   padding: 5px 10px;
   cursor: pointer;
 }

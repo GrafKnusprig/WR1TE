@@ -108,16 +108,41 @@ function loadFolder(folderPath) {
 function addSidebarItem(name, isDirectory) {
   const item = document.createElement('div');
   item.textContent = name;
+  item.classList.add('sidebar-item');
+
   if (isDirectory) {
     item.style.fontWeight = 'bold';
   } else {
     item.addEventListener('click', () => {
+      // Remove active state from any previously active item
+      const activeItem = sidebar.querySelector('.sidebar-item.active');
+      if (activeItem) activeItem.classList.remove('active');
+
+      // Set the active state on the clicked item
+      item.classList.add('active');
+
       saveCurrentFile();
       const fullPath = path.join(currentFolder, name);
       openFile(fullPath);
     });
   }
   sidebar.appendChild(item);
+}
+
+function highlightActiveSidebarItem(filePath) {
+  const fileName = path.basename(filePath);
+  // Remove active state from all items
+  document
+    .querySelectorAll('#sidebar .sidebar-item.active')
+    .forEach((item) => item.classList.remove('active'));
+
+  // Find the matching sidebar item and add active class
+  const matchingItem = Array.from(sidebar.children).find(
+    (item) => item.textContent === fileName
+  );
+  if (matchingItem) {
+    matchingItem.classList.add('active');
+  }
 }
 
 function openFile(filePath) {
@@ -127,6 +152,7 @@ function openFile(filePath) {
     if (err) return console.error(err);
     editor.innerText = data;
     if (previewActive) updatePreview();
+    highlightActiveSidebarItem(filePath);
   });
 }
 
@@ -271,6 +297,14 @@ editor.addEventListener('input', () => {
   if (previewActive) updatePreview();
 });
 
+const fgColorInput = document.getElementById('fgColor');
+
+fgColorInput.addEventListener('input', (e) => {
+  const color = e.target.value;
+  document.documentElement.style.setProperty('--editor-fg-color', color);
+  localStorage.setItem('fgColor', color);
+});
+
 // --- Reload Last Workspace & File on Startup ---
 window.addEventListener('DOMContentLoaded', () => {
   const savedWorkspace = localStorage.getItem('workspace');
@@ -280,6 +314,11 @@ window.addEventListener('DOMContentLoaded', () => {
     if (savedFile) {
       setTimeout(() => openFile(savedFile), 200);
     }
+  }
+  const savedColor = localStorage.getItem('fgColor');
+  if (savedColor) {
+    fgColorInput.value = savedColor;
+    document.documentElement.style.setProperty('--editor-fg-color', savedColor);
   }
 });
 
