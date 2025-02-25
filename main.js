@@ -8,9 +8,9 @@ function createWindow() {
     frame: false,
     fullscreen: true,
     webPreferences: {
-      nodeIntegration: true,    // For simplicity (not recommended in production)
-      contextIsolation: false
-    }
+      nodeIntegration: true, // For simplicity (not recommended in production)
+      contextIsolation: false,
+    },
   });
 
   win.loadFile('index.html');
@@ -19,7 +19,7 @@ function createWindow() {
 // Handle “open folder” request from renderer
 ipcMain.handle('dialog:openFolder', async () => {
   const { canceled, filePaths } = await dialog.showOpenDialog({
-    properties: ['openDirectory']
+    properties: ['openDirectory'],
   });
   if (canceled) {
     return null;

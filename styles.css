@@ -1,154 +1,156 @@
 /* Reset and basics */
-html, body {
-    margin: 0;
-    padding: 0;
-    background: black;
-    color: white;
-    font-family: sans-serif;
-    height: 100%;
-    overflow: hidden;
-    box-sizing: border-box;
-  }
-  
-  *, *:before, *:after {
-    box-sizing: inherit;
-  }
-  
-  /* Custom scrollbar (WebKit-based browsers) */
-  ::-webkit-scrollbar {
-    width: 8px;
-  }
-  ::-webkit-scrollbar-track {
-    background: black;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #555;
-    border-radius: 4px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #777;
-  }
-  ::-webkit-scrollbar-corner {
-    background: black;
-  }
-  
-  /* Top menu bar */
-  #menu {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 40px;
-    background: black; /* full black */
-    padding: 5px 10px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    z-index: 100;
-  }
-  
-  /* Buttons in the menu */
-  #menu button {
-    background: black;
-    color: white;
-    border: 1px solid white;
-    padding: 5px 10px;
-    cursor: pointer;
-  }
-  
-  /* Sidebar on the left */
-  #sidebar {
-    position: fixed;
-    top: 40px; /* below menu */
-    left: 0;
-    bottom: 0;
-    width: 200px;
-    background: black; /* full black */
-    padding: 10px;
-    overflow-y: auto;
-    border-right: 1px solid white;
-  }
-  
-  /* Main editor area */
-  #editor {
-    position: fixed;
-    top: 40px;     /* below menu */
-    left: 200px;   /* next to sidebar */
-    right: 0;
-    bottom: 0;
-    padding: 10px;
-    overflow-y: auto;
-    background: black; /* full black */
-    border-left: 1px solid transparent; /* optional or remove */
-    border-right: 1px solid transparent; /* optional or remove */
-    outline: none; /* default outline is none so you don't see it */
-  }
-  
-  /* Orange outline when saving */
-  #editor.saving {
-    outline: 1px solid orange;
-  }
-  
-  /* Sidebar file entries */
-  #sidebar div {
-    margin-bottom: 5px;
-    cursor: pointer;
-    border-bottom: 1px solid #444;
-    padding: 4px 0;
-  }
-  
-  /* Modal overlay */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: black;
+  color: white;
+  font-family: sans-serif;
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+/* Custom scrollbar (WebKit-based browsers) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: black;
+}
+::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+::-webkit-scrollbar-corner {
+  background: black;
+}
+
+/* Top menu bar */
+#menu {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: black; /* full black */
+  padding: 5px 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  z-index: 100;
+}
+
+/* Buttons in the menu */
+#menu button {
+  background: black;
+  color: white;
+  border: 1px solid white;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+/* Sidebar on the left */
+#sidebar {
+  position: fixed;
+  top: 40px; /* below menu */
+  left: 0;
+  bottom: 0;
+  width: 200px;
+  background: black; /* full black */
+  padding: 10px;
+  overflow-y: auto;
+  border-right: 1px solid white;
+}
+
+/* Main editor area */
+#editor {
+  position: fixed;
+  top: 40px; /* below menu */
+  left: 200px; /* next to sidebar */
+  right: 0;
+  bottom: 0;
+  padding: 10px;
+  overflow-y: auto;
+  background: black; /* full black */
+  border-left: 1px solid transparent; /* optional or remove */
+  border-right: 1px solid transparent; /* optional or remove */
+  outline: none; /* default outline is none so you don't see it */
+}
+
+/* Orange outline when saving */
+#editor.saving {
+  outline: 1px solid orange;
+}
+
+/* Sidebar file entries */
+#sidebar div {
+  margin-bottom: 5px;
+  cursor: pointer;
+  border-bottom: 1px solid #444;
+  padding: 4px 0;
+}
+
+/* Modal overlay */
 .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 200;
-  }
-  
-  .modal.hidden {
-    display: none;
-  }
-  
-  /* Modal content */
-  .modal-content {
-    background: #222;
-    border: 1px solid white;
-    padding: 20px;
-    width: 300px;
-    border-radius: 4px;
-    text-align: center;
-  }
-  
-  .modal-content h3 {
-    margin-top: 0;
-    color: white;
-  }
-  
-  .modal-content input {
-    width: 90%;
-    padding: 5px;
-    margin: 10px 0;
-    background: black;
-    border: 1px solid white;
-    color: white;
-  }
-  
-  .modal-buttons {
-    display: flex;
-    justify-content: space-around;
-  }
-  
-  .modal-buttons button {
-    background: black;
-    color: white;
-    border: 1px solid white;
-    padding: 5px 10px;
-    cursor: pointer;
-  }
-  
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+/* Modal content */
+.modal-content {
+  background: #222;
+  border: 1px solid white;
+  padding: 20px;
+  width: 300px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  color: white;
+}
+
+.modal-content input {
+  width: 90%;
+  padding: 5px;
+  margin: 10px 0;
+  background: black;
+  border: 1px solid white;
+  color: white;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-around;
+}
+
+.modal-buttons button {
+  background: black;
+  color: white;
+  border: 1px solid white;
+  padding: 5px 10px;
+  cursor: pointer;
+}

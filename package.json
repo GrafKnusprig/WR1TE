@@ -14,21 +14,21 @@
     "electron-builder": "^25.1.8"
   },
   "build": {
-      "appId": "com.example.yourapp",
-      "productName": "YourApp",
-      "files": [
-        "dist/**/*",
-        "node_modules/**/*",
-        "package.json"
-      ],
-      "mac": {
-        "target": "dmg"
-      },
-      "win": {
-        "target": "nsis"
-      },
-      "linux": {
-        "target": "AppImage"
-      }
+    "appId": "com.example.yourapp",
+    "productName": "YourApp",
+    "files": [
+      "dist/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
   }
 }
