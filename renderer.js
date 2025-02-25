@@ -4,9 +4,11 @@ const path = require('path');
 
 const sidebar = document.getElementById('sidebar');
 const editor = document.getElementById('editor');
-let currentFolder = null;
 
-// Modal helper
+let currentFolder = null;
+let currentFilePath = null;
+
+// --- Modal Setup ---
 const modal = document.getElementById('modal');
 const modalTitle = document.getElementById('modalTitle');
 const modalInput = document.getElementById('modalInput');
@@ -19,7 +21,6 @@ function showModal(title, defaultValue) {
   modal.classList.remove('hidden');
 
   return new Promise((resolve) => {
-    // Cleanup existing listeners to avoid duplicates
     modalOk.onclick = () => {
       modal.classList.add('hidden');
       resolve(modalInput.value.trim());
@@ -31,10 +32,45 @@ function showModal(title, defaultValue) {
   });
 }
 
-// Helper to load folder content into sidebar
+function flashEditorSaved() {
+    editor.classList.add('saving');
+    setTimeout(() => {
+      editor.classList.remove('saving');
+    }, 250);
+  }
+  
+function saveCurrentFile() {
+if (!currentFilePath) return;
+const content = editor.textContent;
+fs.writeFile(currentFilePath, content, 'utf8', (err) => {
+    if (err) console.error("Save failed:", err);
+    else {
+    console.log("File saved:", currentFilePath);
+    flashEditorSaved();
+    }
+});
+}
+
+// Auto-save every 8 seconds
+setInterval(saveCurrentFile, 8000);
+
+// Save on Ctrl+S (or Command+S)
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+    e.preventDefault();
+    saveCurrentFile();
+  }
+});
+
+// Save on window close
+window.addEventListener('beforeunload', saveCurrentFile);
+
+// --- Folder & File Handling ---
 function loadFolder(folderPath) {
   currentFolder = folderPath;
-  sidebar.innerHTML = ''; // clear existing content
+  localStorage.setItem('workspace', folderPath); // Remember workspace
+  sidebar.innerHTML = ''; // Clear sidebar
+
   fs.readdir(folderPath, { withFileTypes: true }, (err, entries) => {
     if (err) return console.error(err);
     entries.forEach(entry => {
@@ -44,36 +80,33 @@ function loadFolder(folderPath) {
         item.style.fontWeight = 'bold';
       }
       item.addEventListener('click', () => {
-        // If it's a file, open it in the editor.
         if (!entry.isDirectory()) {
+          saveCurrentFile();
           openFile(path.join(folderPath, entry.name));
         }
-        // For folders, you might load its content (optional)
-        // item.addEventListener('click', () => loadFolder(path.join(folderPath, entry.name)));
       });
       sidebar.appendChild(item);
     });
   });
 }
 
-// Open file function
 function openFile(filePath) {
+  currentFilePath = filePath;
+  localStorage.setItem('lastFile', filePath); // Remember last file
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) return console.error(err);
     editor.textContent = data;
   });
 }
 
-// Open Folder button listener
+// --- Button Listeners ---
 document.getElementById('openFolder').addEventListener('click', async () => {
   const folderPath = await ipcRenderer.invoke('dialog:openFolder');
   if (!folderPath) return;
   loadFolder(folderPath);
 });
 
-// New File button listener
 document.getElementById('newFile').addEventListener('click', async () => {
-  // If no folder is open, ask for one.
   if (!currentFolder) {
     const folderPath = await ipcRenderer.invoke('dialog:openFolder');
     if (!folderPath) return;
@@ -81,18 +114,20 @@ document.getElementById('newFile').addEventListener('click', async () => {
   }
   const fileName = await showModal("Enter new file name", "untitled.md");
   if (!fileName) return;
-  const filePath = path.join(currentFolder, fileName);
-  fs.writeFile(filePath, "", err => {
+  currentFilePath = path.join(currentFolder, fileName);
+  fs.writeFile(currentFilePath, "", err => {
     if (err) return console.error(err);
-    // Add the new file to sidebar
+    // Add new file to sidebar
     const item = document.createElement('div');
     item.textContent = fileName;
-    item.addEventListener('click', () => openFile(filePath));
+    item.addEventListener('click', () => {
+      saveCurrentFile();
+      openFile(path.join(currentFolder, fileName));
+    });
     sidebar.appendChild(item);
   });
 });
 
-// New Folder button listener
 document.getElementById('newFolder').addEventListener('click', async () => {
   if (!currentFolder) {
     const folderPath = await ipcRenderer.invoke('dialog:openFolder');
@@ -104,7 +139,7 @@ document.getElementById('newFolder').addEventListener('click', async () => {
   const newFolderPath = path.join(currentFolder, folderName);
   fs.mkdir(newFolderPath, { recursive: true }, err => {
     if (err) return console.error(err);
-    // Add the new folder to sidebar
+    // Add new folder to sidebar
     const item = document.createElement('div');
     item.textContent = folderName;
     item.style.fontWeight = 'bold';
@@ -113,7 +148,19 @@ document.getElementById('newFolder').addEventListener('click', async () => {
   });
 });
 
-// Export PDF button stub
 document.getElementById('exportPDF').addEventListener('click', () => {
   console.log('PDF export not implemented yet');
+});
+
+// --- Reload Last Workspace & File on Startup ---
+window.addEventListener('DOMContentLoaded', () => {
+  const savedWorkspace = localStorage.getItem('workspace');
+  const savedFile = localStorage.getItem('lastFile');
+  if (savedWorkspace) {
+    loadFolder(savedWorkspace);
+    if (savedFile) {
+      // Wait a short time for the folder to load
+      setTimeout(() => openFile(savedFile), 200);
+    }
+  }
 });

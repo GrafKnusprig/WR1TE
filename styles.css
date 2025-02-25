@@ -81,6 +81,12 @@ html, body {
     background: black; /* full black */
     border-left: 1px solid transparent; /* optional or remove */
     border-right: 1px solid transparent; /* optional or remove */
+    outline: none; /* default outline is none so you don't see it */
+  }
+  
+  /* Orange outline when saving */
+  #editor.saving {
+    outline: 1px solid orange;
   }
   
   /* Sidebar file entries */
