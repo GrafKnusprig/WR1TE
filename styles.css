@@ -82,9 +82,8 @@ body {
 }
 
 #sidebar div.sidebar-item.active {
-  border: 1px solid #ffffff;
   background: rgba(255, 255, 255, 0.1);
-  padding: 3px;
+  padding: 2px;
 }
 
 /* Main editor area */

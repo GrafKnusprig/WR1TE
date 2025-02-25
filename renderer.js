@@ -80,7 +80,20 @@ function loadFolder(folderPath) {
   fs.readdir(folderPath, { withFileTypes: true }, (err, entries) => {
     if (err) return console.error(err);
     entries.forEach((entry) => {
-      addSidebarItem(entry.name, entry.isDirectory());
+      if (entry.isDirectory()) {
+        addSidebarItem(entry.name, true);
+      } else {
+        const ext = path.extname(entry.name).toLowerCase();
+        // Allow text files or media files (images, pdf)
+        if (
+          ext === '.md' ||
+          ext === '.txt' ||
+          ext === '.pdf' ||
+          ['.png', '.jpg', '.jpeg', '.gif', '.bmp'].includes(ext)
+        ) {
+          addSidebarItem(entry.name, false);
+        }
+      }
     });
   });
 
@@ -113,20 +126,71 @@ function addSidebarItem(name, isDirectory) {
   if (isDirectory) {
     item.style.fontWeight = 'bold';
   } else {
+    // Determine file type based on extension
+    const ext = path.extname(name).toLowerCase();
+    let fileType = '';
+    if (ext === '.md' || ext === '.txt') {
+      fileType = 'text';
+    } else if (
+      ext === '.pdf' ||
+      ['.png', '.jpg', '.jpeg', '.gif', '.bmp'].includes(ext)
+    ) {
+      fileType = 'media';
+    }
+    item.dataset.fileType = fileType;
+
     item.addEventListener('click', () => {
-      // Remove active state from any previously active item
+      // Clear any previous active state
       const activeItem = sidebar.querySelector('.sidebar-item.active');
       if (activeItem) activeItem.classList.remove('active');
-
-      // Set the active state on the clicked item
       item.classList.add('active');
 
-      saveCurrentFile();
       const fullPath = path.join(currentFolder, name);
-      openFile(fullPath);
+      if (fileType === 'text') {
+        // Save current text file and then open the new one
+        saveCurrentFile();
+        openTextFile(fullPath);
+      } else if (fileType === 'media') {
+        openMediaFile(fullPath);
+      }
     });
   }
   sidebar.appendChild(item);
+}
+
+function openTextFile(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  if (ext !== '.md' && ext !== '.txt') {
+    alert(
+      'Only Markdown (.md) and text (.txt) files are supported for editing.'
+    );
+    return;
+  }
+  currentFilePath = filePath;
+  localStorage.setItem('lastFile', filePath);
+  fs.readFile(filePath, 'utf8', (err, data) => {
+    if (err) return console.error(err);
+    editor.innerText = data;
+    if (previewActive) updatePreview();
+    highlightActiveSidebarItem(filePath);
+  });
+}
+
+function openMediaFile(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  // Ensure preview mode is active
+  if (!previewActive) {
+    togglePreview(); // Switches to split view (editor left, preview right)
+  }
+  if (ext === '.pdf') {
+    previewPanel.innerHTML = `<iframe src="file://${filePath}" style="width:100%; height:100%;" frameborder="0"></iframe>`;
+  } else if (['.png', '.jpg', '.jpeg', '.gif', '.bmp'].includes(ext)) {
+    previewPanel.innerHTML = `<img src="file://${filePath}" style="max-width:100%; max-height:100%;" />`;
+  } else {
+    previewPanel.innerHTML = 'Unsupported media file.';
+  }
+  // Set focus back to the editor so it remains editable
+  editor.focus();
 }
 
 function highlightActiveSidebarItem(filePath) {
@@ -295,6 +359,12 @@ function updatePreview() {
 
 editor.addEventListener('input', () => {
   if (previewActive) updatePreview();
+});
+
+editor.addEventListener('click', () => {
+  if (currentFilePath) {
+    highlightActiveSidebarItem(currentFilePath);
+  }
 });
 
 const fgColorInput = document.getElementById('fgColor');
