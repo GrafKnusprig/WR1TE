@@ -3,7 +3,7 @@ html, body {
     margin: 0;
     padding: 0;
     background: black;
-    color: #ccc;
+    color: white;
     font-family: sans-serif;
     height: 100%;
     overflow: hidden;
@@ -14,6 +14,24 @@ html, body {
     box-sizing: inherit;
   }
   
+  /* Custom scrollbar (WebKit-based browsers) */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: black;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #777;
+  }
+  ::-webkit-scrollbar-corner {
+    background: black;
+  }
+  
   /* Top menu bar */
   #menu {
     position: fixed;
@@ -21,7 +39,7 @@ html, body {
     left: 0;
     right: 0;
     height: 40px;
-    background: #222;
+    background: black; /* full black */
     padding: 5px 10px;
     display: flex;
     gap: 10px;
@@ -29,10 +47,11 @@ html, body {
     z-index: 100;
   }
   
+  /* Buttons in the menu */
   #menu button {
-    background: #444;
-    color: #ccc;
-    border: none;
+    background: black;
+    color: white;
+    border: 1px solid white;
     padding: 5px 10px;
     cursor: pointer;
   }
@@ -44,10 +63,10 @@ html, body {
     left: 0;
     bottom: 0;
     width: 200px;
-    background: #111;
+    background: black; /* full black */
     padding: 10px;
     overflow-y: auto;
-    border-right: 1px solid #444;
+    border-right: 1px solid white;
   }
   
   /* Main editor area */
@@ -59,11 +78,16 @@ html, body {
     bottom: 0;
     padding: 10px;
     overflow-y: auto;
+    background: black; /* full black */
+    border-left: 1px solid transparent; /* optional or remove */
+    border-right: 1px solid transparent; /* optional or remove */
   }
   
-  /* Simple style for file entries */
+  /* Sidebar file entries */
   #sidebar div {
     margin-bottom: 5px;
     cursor: pointer;
+    border-bottom: 1px solid #444;
+    padding: 4px 0;
   }
   

@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 
 function createWindow() {
@@ -8,13 +8,25 @@ function createWindow() {
     frame: false,
     fullscreen: true,
     webPreferences: {
-      nodeIntegration: true,
+      nodeIntegration: true,    // For simplicity (not recommended in production)
       contextIsolation: false
     }
   });
 
   win.loadFile('index.html');
 }
+
+// Handle “open folder” request from renderer
+ipcMain.handle('dialog:openFolder', async () => {
+  const { canceled, filePaths } = await dialog.showOpenDialog({
+    properties: ['openDirectory']
+  });
+  if (canceled) {
+    return null;
+  } else {
+    return filePaths[0]; // Return the selected folder path
+  }
+});
 
 app.whenReady().then(createWindow);
 
