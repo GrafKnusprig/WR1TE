@@ -2,11 +2,17 @@
 
 WR1TE is a minimal Electron-based Markdown editor and workspace app for creating, editing, and previewing Markdown (`.md`) and text (`.txt`) files. It also supports viewing media files like images and PDFs in a split preview mode.
 
+## Note
+
+This was just a fun evening project. There are a few bugs and I don't know if I will fix them. It depends if I will use the app in my workflow or not.
+
 ## Download
 
 Download the latest release of WR1TE from the [Releases](https://github.com/GrafKnusprig/WR1TE/releases) page.
 
 For Windows users, download the installer (NSIS) and run it to install the app on your machine.
+
+![WR1TE](image.png)
 
 ## Features
 
