@@ -171,25 +171,6 @@ document.getElementById('newFile').addEventListener('click', async () => {
   });
 });
 
-document.getElementById('newFolder').addEventListener('click', async () => {
-  if (!currentFolder) {
-    const folderPath = await ipcRenderer.invoke('dialog:openFolder');
-    if (!folderPath) return;
-    loadFolder(folderPath);
-  }
-  const folderName = await showModal('Enter new folder name', 'New Folder');
-  if (!folderName) return;
-  const newFolderPath = path.join(currentFolder, folderName);
-  fs.mkdir(newFolderPath, { recursive: true }, (err) => {
-    if (err) return console.error(err);
-    const item = document.createElement('div');
-    item.textContent = folderName;
-    item.style.fontWeight = 'bold';
-    item.addEventListener('click', () => loadFolder(newFolderPath));
-    sidebar.appendChild(item);
-  });
-});
-
 // --- Export PDF ---
 // This listener converts your markdown into rendered HTML and sends it to main.
 document.getElementById('exportPDF').addEventListener('click', async () => {
