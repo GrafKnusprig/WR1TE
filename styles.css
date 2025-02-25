@@ -1,0 +1,69 @@
+/* Reset and basics */
+html, body {
+    margin: 0;
+    padding: 0;
+    background: black;
+    color: #ccc;
+    font-family: sans-serif;
+    height: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+  
+  *, *:before, *:after {
+    box-sizing: inherit;
+  }
+  
+  /* Top menu bar */
+  #menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: #222;
+    padding: 5px 10px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    z-index: 100;
+  }
+  
+  #menu button {
+    background: #444;
+    color: #ccc;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  /* Sidebar on the left */
+  #sidebar {
+    position: fixed;
+    top: 40px; /* below menu */
+    left: 0;
+    bottom: 0;
+    width: 200px;
+    background: #111;
+    padding: 10px;
+    overflow-y: auto;
+    border-right: 1px solid #444;
+  }
+  
+  /* Main editor area */
+  #editor {
+    position: fixed;
+    top: 40px;     /* below menu */
+    left: 200px;   /* next to sidebar */
+    right: 0;
+    bottom: 0;
+    padding: 10px;
+    overflow-y: auto;
+  }
+  
+  /* Simple style for file entries */
+  #sidebar div {
+    margin-bottom: 5px;
+    cursor: pointer;
+  }
+  
