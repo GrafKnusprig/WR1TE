@@ -8,10 +8,25 @@
   <body>
     <div id="menu">
       <button id="openFolder">Open Folder</button>
+      <button id="newFile">New File</button>
+      <button id="newFolder">New Folder</button>
       <button id="exportPDF">Export PDF</button>
     </div>
     <div id="sidebar"></div>
     <div id="editor" contenteditable="true">Start editing...</div>
+
+    <!-- Custom Modal -->
+    <div id="modal" class="modal hidden">
+      <div class="modal-content">
+        <h3 id="modalTitle">Enter a Name</h3>
+        <input type="text" id="modalInput" />
+        <div class="modal-buttons">
+          <button id="modalCancel">Cancel</button>
+          <button id="modalOk">OK</button>
+        </div>
+      </div>
+    </div>
+
     <script src="renderer.js"></script>
   </body>
 </html>
