@@ -41,7 +41,8 @@ function flashEditorSaved() {
 
 function saveCurrentFile() {
   if (!currentFilePath) return;
-  const content = editor.textContent;
+  // Use innerText so the newlines are preserved
+  const content = editor.innerText;
   fs.writeFile(currentFilePath, content, 'utf8', (err) => {
     if (err) console.error('Save failed:', err);
     else {
@@ -132,10 +133,11 @@ function addSidebarItem(name, isDirectory) {
 
 function openFile(filePath) {
   currentFilePath = filePath;
-  localStorage.setItem('lastFile', filePath); // Remember last file
+  localStorage.setItem('lastFile', filePath);
   fs.readFile(filePath, 'utf8', (err, data) => {
     if (err) return console.error(err);
-    editor.textContent = data;
+    // Set innerText to preserve the linebreaks in plain text
+    editor.innerText = data;
   });
 }
 
@@ -232,3 +234,55 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   }
 });
+
+editor.addEventListener('paste', (e) => {
+  const items = e.clipboardData.items;
+  let handledImage = false;
+  for (let i = 0; i < items.length; i++) {
+    const item = items[i];
+    if (item.type.indexOf('image') !== -1) {
+      // Prevent default paste so only our markdown embed is inserted
+      e.preventDefault();
+      handledImage = true;
+      const blob = item.getAsFile();
+      const ext = '.png';
+      const imageName = `image_${Date.now()}${ext}`;
+      const folder = path.dirname(currentFilePath);
+      const destPath = path.join(folder, imageName);
+      const reader = new FileReader();
+      reader.onload = function () {
+        const base64Data = reader.result.split(',')[1];
+        const buffer = Buffer.from(base64Data, 'base64');
+        fs.writeFile(destPath, buffer, (err) => {
+          if (err) console.error('Saving pasted image failed:', err);
+          else {
+            // Insert markdown image embed at cursor
+            insertAtCursor(`\n\n![Image](${imageName})\n`);
+          }
+        });
+      };
+      reader.readAsDataURL(blob);
+      // Stop processing after handling one image
+      break;
+    }
+  }
+  // If an image was handled, we don't let the default paste occur
+  if (handledImage) {
+    e.preventDefault();
+  }
+});
+
+function insertAtCursor(text) {
+  const sel = window.getSelection();
+  if (sel.rangeCount) {
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    const textNode = document.createTextNode(text);
+    range.insertNode(textNode);
+    // Move the cursor after the inserted node:
+    range.setStartAfter(textNode);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+}
