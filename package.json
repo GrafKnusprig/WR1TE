@@ -1,5 +1,5 @@
 {
-  "name": "wr1te",
+  "name": "WR1TE",
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
@@ -15,7 +15,7 @@
     "electron-builder": "^25.1.8"
   },
   "build": {
-    "appId": "com.example.wr1te",
+    "appId": "com.philippraven.wr1te",
     "productName": "WR1TE",
     "files": [
       "main.js",
@@ -27,6 +27,10 @@
     "win": {
       "icon": "icon.ico",
       "target": "nsis"
+    },
+    "mac": {
+      "icon": "icon.icns",
+      "target": "dmg"
     }
   },
   "dependencies": {
